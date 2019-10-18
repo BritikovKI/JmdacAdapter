@@ -12,7 +12,7 @@ import java.util.Map;
 import org.but4reuse.adapters.IAdapter;
 import org.but4reuse.adapters.IElement;
 import org.but4reuse.adapters.jmdac.FileElement;
-import org.but4reuse.adapters.jmdac.PluginElement;
+import org.but4reuse.adapters.jmdac.ModuleElement;
 import org.but4reuse.adapters.jmdac.plugin_infos_extractor.utils.DependenciesBuilder;
 import org.but4reuse.adapters.jmdac.plugin_infos_extractor.utils.PluginInfosExtractor;
 import org.but4reuse.utils.files.FileUtils;
@@ -71,9 +71,8 @@ public class JmdacAdapter implements IAdapter {
 
 		// plugin dependencies
 		for (IElement elem : elements) {
-			PluginElement pl = new PluginElement();
-			if (elem instanceof PluginElement) {
-				PluginElement pe = (PluginElement) elem;
+			if (elem instanceof ModuleElement) {
+				ModuleElement pe = (ModuleElement) elem;
 				DependenciesBuilder.build(pe, elements);
 			}
 		}
@@ -118,8 +117,8 @@ public class JmdacAdapter implements IAdapter {
 		}
 
 		// Add the bundles info
-		if (newElement instanceof PluginElement) {
-			PluginElement plugin = (PluginElement) newElement;
+		if (newElement instanceof ModuleElement) {
+			ModuleElement plugin = (ModuleElement) newElement;
 			String line = bundlesInfoLines.get(plugin.getSymbName());
 			// in the case of source code plugins, line will be null but no
 			// problem
@@ -191,8 +190,8 @@ public class JmdacAdapter implements IAdapter {
 				}
 				// prepare the bundles.info configuration file
 				// just in case we need to construct it
-				if (element instanceof PluginElement) {
-					PluginElement pluginElement = (PluginElement) element;
+				if (element instanceof ModuleElement) {
+					ModuleElement pluginElement = (ModuleElement) element;
 					String line = pluginElement.getBundleInfoLine();
 					if (line != null) {
 						String[] lineFields = line.split(",");

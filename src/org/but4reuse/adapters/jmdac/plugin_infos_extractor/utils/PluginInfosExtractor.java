@@ -15,7 +15,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
 
-import org.but4reuse.adapters.jmdac.PluginElement;
+import org.but4reuse.adapters.jmdac.ModuleElement;
 import org.but4reuse.utils.files.FileUtils;
 
 public class PluginInfosExtractor {
@@ -33,7 +33,7 @@ public class PluginInfosExtractor {
 
 	private static String currentLocalization = null;
 
-	private static void fillPluginElementInfo(PluginElement plugin, Manifest manifest) {
+	private static void fillPluginElementInfo(ModuleElement plugin, Manifest manifest) {
 		Attributes attributes = manifest.getMainAttributes();
 		String value = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
 		int i = value.indexOf(';');
@@ -77,8 +77,8 @@ public class PluginInfosExtractor {
 	 * @return a PluginElement containing all the required informations
 	 * @throws FileNotFoundException
 	 */
-	public static PluginElement getPluginInfosFromManifest(String manifestFile) {
-		PluginElement plugin = new PluginElement();
+	public static ModuleElement getPluginInfosFromManifest(String manifestFile) {
+		ModuleElement plugin = new ModuleElement();
 		plugin.setJar(false);
 		File f = new File(manifestFile);
 		f = f.getParentFile().getParentFile();
@@ -119,8 +119,8 @@ public class PluginInfosExtractor {
 	 *            the absolute path to the jar file
 	 * @return the plugin element
 	 */
-	public static PluginElement getPluginInfosFromJar(String jarFile) {
-		PluginElement plugin = new PluginElement();
+	public static ModuleElement getPluginInfosFromJar(String jarFile) {
+		ModuleElement plugin = new ModuleElement();
 		plugin.setJar(true);
 		plugin.setAbsolutePath(jarFile);
 		try {
@@ -157,7 +157,7 @@ public class PluginInfosExtractor {
 	 *            the PluginElement for which we are searching the required
 	 *            plugins
 	 */
-	private static void getRequireBundlesSymbNames(String value, PluginElement plugin) {
+	private static void getRequireBundlesSymbNames(String value, ModuleElement plugin) {
 		String[] values = value.split(",");
 		String previous = "";
 		for (String val : values) {

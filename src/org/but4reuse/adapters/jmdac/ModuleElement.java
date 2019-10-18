@@ -12,7 +12,7 @@ import org.but4reuse.utils.strings.StringUtils;
  * @author Diana MALABARD
  * @author Jason CHUMMUN
  */
-public class PluginElement extends FileElement {
+public class ModuleElement extends FileElement {
 
 	private String pluginSymbName;
 	private String pluginVersion;
@@ -29,8 +29,8 @@ public class PluginElement extends FileElement {
 	public double similarity(IElement anotherElement) {
 		// When they have the same relative URI
 		// TODO URIs can reference to the same file... check this
-		if (anotherElement instanceof PluginElement) {
-			PluginElement anotherPluginElement = ((PluginElement) anotherElement);
+		if (anotherElement instanceof ModuleElement) {
+			ModuleElement anotherPluginElement = ((ModuleElement) anotherElement);
 
 			// Same symbolic name
 			if (this.getSymbName().equals(anotherPluginElement.getSymbName())) {
@@ -48,7 +48,7 @@ public class PluginElement extends FileElement {
 	private String absolutePath;
 	private boolean isJar;
 
-	public PluginElement() {
+	public ModuleElement() {
 		require_Bundles = new ArrayList<String>();
 	}
 

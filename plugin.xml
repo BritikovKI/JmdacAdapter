@@ -10,7 +10,7 @@
             name="Jmdac">
          <elements>
             <element
-                  element="org.but4reuse.adapters.jmdac.PluginElement">
+                  element="org.but4reuse.adapters.jmdac.ModuleElement">
             </element>
             <element
                   element="org.but4reuse.adapters.jmdac.FileElement">
