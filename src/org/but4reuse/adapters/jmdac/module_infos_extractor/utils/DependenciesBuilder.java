@@ -1,4 +1,4 @@
-package org.but4reuse.adapters.jmdac.plugin_infos_extractor.utils;
+package org.but4reuse.adapters.jmdac.module_infos_extractor.utils;
 
 import java.util.List;
 

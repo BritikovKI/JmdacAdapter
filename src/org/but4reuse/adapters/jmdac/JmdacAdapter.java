@@ -13,8 +13,8 @@ import org.but4reuse.adapters.IAdapter;
 import org.but4reuse.adapters.IElement;
 import org.but4reuse.adapters.jmdac.FileElement;
 import org.but4reuse.adapters.jmdac.ModuleElement;
-import org.but4reuse.adapters.jmdac.plugin_infos_extractor.utils.DependenciesBuilder;
-import org.but4reuse.adapters.jmdac.plugin_infos_extractor.utils.PluginInfosExtractor;
+import org.but4reuse.adapters.jmdac.module_infos_extractor.utils.DependenciesBuilder;
+import org.but4reuse.adapters.jmdac.module_infos_extractor.utils.PluginInfosExtractor;
 import org.but4reuse.utils.files.FileUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 
