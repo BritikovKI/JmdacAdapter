@@ -14,7 +14,7 @@ import org.but4reuse.adapters.IElement;
 import org.but4reuse.adapters.jmdac.FileElement;
 import org.but4reuse.adapters.jmdac.ModuleElement;
 import org.but4reuse.adapters.jmdac.module_infos_extractor.utils.DependenciesBuilder;
-import org.but4reuse.adapters.jmdac.module_infos_extractor.utils.PluginInfosExtractor;
+import org.but4reuse.adapters.jmdac.module_infos_extractor.utils.ModuleInfosExtractor;
 import org.but4reuse.utils.files.FileUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
  * @author Krista Drushku
  * @author Diana MALABARD
  * @author Jason CHUMMUN
- * @param <PluginElement>
+ * @param <ModuleElement>
  * 
  */
 public class JmdacAdapter implements IAdapter {
@@ -40,8 +40,8 @@ public class JmdacAdapter implements IAdapter {
 	public boolean isAdaptable(URI uri, IProgressMonitor monitor) {
 		File file = FileUtils.getFile(uri);
 		if (file.isDirectory()) {
-			File pluginsFolder = new File(file.getAbsolutePath() + "/plugins");
-			return pluginsFolder.exists() && pluginsFolder.isDirectory();
+			File modulesFolder = new File(file.getAbsolutePath() + "/modules");
+			return modulesFolder.exists() && modulesFolder.isDirectory();
 		}
 		return false;
 	}
@@ -49,7 +49,7 @@ public class JmdacAdapter implements IAdapter {
 	Map<String, String> bundlesInfoLines;
 
 	/**
-	 * Provides the atomic elements (plugins) this distribution is made of
+	 * Provides the atomic elements (modules) this distribution is made of
 	 * 
 	 * @param uri
 	 *            URI of the distribution
@@ -64,12 +64,12 @@ public class JmdacAdapter implements IAdapter {
 
 		// A hashmap of bundle symbolic names and the complete line in the
 		// bundles.info file
-		bundlesInfoLines = PluginInfosExtractor.createBundlesInfoMap(uri);
+		bundlesInfoLines = ModuleInfosExtractor.createBundlesInfoMap(uri);
 
 		// start the containment tree traversal, with null as initial container
 		adapt(file, elements, null);
 
-		// plugin dependencies
+		// module dependencies
 		for (IElement elem : elements) {
 			if (elem instanceof ModuleElement) {
 				ModuleElement pe = (ModuleElement) elem;
@@ -90,15 +90,15 @@ public class JmdacAdapter implements IAdapter {
 	 */
 	private void adapt(File file, List<IElement> elements, IElement container) {
 		FileElement newElement = null;
-		if (PluginInfosExtractor.isAPlugin(file)) {
+		if (ModuleInfosExtractor.isAModule(file)) {
 			try {
-				// Unzipped plugin
+				// Unzipped module
 				if (file.isDirectory()) {
-					newElement = PluginInfosExtractor.getPluginInfosFromManifest(file.getAbsolutePath()
+					newElement = ModuleInfosExtractor.getModuleInfosFromManifest(file.getAbsolutePath()
 							+ "/META-INF/MANIFEST.MF");
 				} else {
-					// Jar plugin
-					newElement = PluginInfosExtractor.getPluginInfosFromJar(file.getAbsolutePath());
+					// Jar module
+					newElement = ModuleInfosExtractor.getModuleInfosFromJar(file.getAbsolutePath());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -118,16 +118,16 @@ public class JmdacAdapter implements IAdapter {
 
 		// Add the bundles info
 		if (newElement instanceof ModuleElement) {
-			ModuleElement plugin = (ModuleElement) newElement;
-			String line = bundlesInfoLines.get(plugin.getSymbName());
-			// in the case of source code plugins, line will be null but no
+			ModuleElement module = (ModuleElement) newElement;
+			String line = bundlesInfoLines.get(module.getSymbName());
+			// in the case of source code modules, line will be null but no
 			// problem
-			plugin.setBundleInfoLine(line);
+			module.setBundleInfoLine(line);
 
-			// if (plugin.getName() == null || plugin.getName().contains("%")) {
+			// if (module.getName() == null || module.getName().contains("%")) {
 			// System.out.println("EclipseAdapter.adapt() No name found: " +
-			// " isFragment:" + plugin.isFragment()
-			// + "  " + plugin.getSymbName() + " at " + file.getAbsolutePath());
+			// " isFragment:" + module.isFragment()
+			// + "  " + module.getSymbName() + " at " + file.getAbsolutePath());
 			// }
 
 		}
@@ -168,7 +168,7 @@ public class JmdacAdapter implements IAdapter {
 				monitor.subTask(element.getText());
 				if (element instanceof FileElement) {
 					FileElement fileElement = (FileElement) element;
-					if (fileElement.getRelativeURI().toString().equals(PluginInfosExtractor.BUNDLESINFO_RELATIVEPATH)) {
+					if (fileElement.getRelativeURI().toString().equals(ModuleInfosExtractor.BUNDLESINFO_RELATIVEPATH)) {
 						constructBundlesInfo = true;
 					}
 					try {
@@ -191,13 +191,13 @@ public class JmdacAdapter implements IAdapter {
 				// prepare the bundles.info configuration file
 				// just in case we need to construct it
 				if (element instanceof ModuleElement) {
-					ModuleElement pluginElement = (ModuleElement) element;
-					String line = pluginElement.getBundleInfoLine();
+					ModuleElement moduleElement = (ModuleElement) element;
+					String line = moduleElement.getBundleInfoLine();
 					if (line != null) {
 						String[] lineFields = line.split(",");
-						bundlesInfoContent += pluginElement.getSymbName() + ",";
-						bundlesInfoContent += pluginElement.getVersion() + ",";
-						bundlesInfoContent += pluginElement.getRelativeURI() + ",";
+						bundlesInfoContent += moduleElement.getSymbName() + ",";
+						bundlesInfoContent += moduleElement.getVersion() + ",";
+						bundlesInfoContent += moduleElement.getRelativeURI() + ",";
 						bundlesInfoContent += lineFields[3] + ",";
 						bundlesInfoContent += lineFields[4] + "\n";
 					}
@@ -212,7 +212,7 @@ public class JmdacAdapter implements IAdapter {
 				FileUtils.appendToFile(tmpFile, bundlesInfoContent);
 				File file = FileUtils.getFile(uri);
 				File bundlesInfo = new File(file.getAbsolutePath() + "/"
-						+ PluginInfosExtractor.BUNDLESINFO_RELATIVEPATH);
+						+ ModuleInfosExtractor.BUNDLESINFO_RELATIVEPATH);
 				FileUtils.replace(bundlesInfo, tmpFile);
 				tmpFile.deleteOnExit();
 			} catch (Exception e) {

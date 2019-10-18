@@ -18,7 +18,7 @@ import java.util.zip.ZipEntry;
 import org.but4reuse.adapters.jmdac.ModuleElement;
 import org.but4reuse.utils.files.FileUtils;
 
-public class PluginInfosExtractor {
+public class ModuleInfosExtractor {
 	public static final String BUNDLESINFO_RELATIVEPATH = "configuration/org.eclipse.equinox.simpleconfigurator/bundles.info";
 	private static final String BUNDLE_VERSION = "Bundle-Version";
 	private static final String BUNDLE_NAME = "Bundle-Name";
@@ -33,13 +33,13 @@ public class PluginInfosExtractor {
 
 	private static String currentLocalization = null;
 
-	private static void fillPluginElementInfo(ModuleElement plugin, Manifest manifest) {
+	private static void fillModuleElementInfo(ModuleElement module, Manifest manifest) {
 		Attributes attributes = manifest.getMainAttributes();
 		String value = attributes.getValue(BUNDLE_SYMBOLIC_NAME);
 		int i = value.indexOf(';');
 		if (i != -1)
 			value = value.substring(0, i);
-		plugin.setSymbName(value);
+		module.setSymbName(value);
 
 		// Fragment info
 		String fragmentHost = attributes.getValue(FRAGMENT_HOST);
@@ -47,14 +47,14 @@ public class PluginInfosExtractor {
 			i = fragmentHost.indexOf(';');
 			if (i != -1)
 				fragmentHost = fragmentHost.substring(0, i);
-			plugin.setFragmentHost(fragmentHost);
+			module.setFragmentHost(fragmentHost);
 		}
 
 		String version = attributes.getValue(BUNDLE_VERSION);
-		plugin.setVersion(version);
+		module.setVersion(version);
 		value = attributes.getValue(REQUIRE_BUNDLE);
 		if (value != null) {
-			getRequireBundlesSymbNames(value, plugin);
+			getRequireBundlesSymbNames(value, module);
 		}
 
 		// Name
@@ -63,33 +63,33 @@ public class PluginInfosExtractor {
 			currentLocalization = DEFAULT_LOCALIZATION;
 		}
 		String name = attributes.getValue(BUNDLE_NAME);
-		plugin.setName(name);
+		module.setName(name);
 	}
 
 	/*
 	 * FOLDERS
 	 */
 	/**
-	 * Extracts the plugin infos from its MANIFEST.MF file
+	 * Extracts the module infos from its MANIFEST.MF file
 	 * 
 	 * @param manifestFile
 	 *            the absolute path to the manifest
-	 * @return a PluginElement containing all the required informations
+	 * @return a ModuleElement containing all the required informations
 	 * @throws FileNotFoundException
 	 */
-	public static ModuleElement getPluginInfosFromManifest(String manifestFile) {
-		ModuleElement plugin = new ModuleElement();
-		plugin.setJar(false);
+	public static ModuleElement getModuleInfosFromManifest(String manifestFile) {
+		ModuleElement module = new ModuleElement();
+		module.setJar(false);
 		File f = new File(manifestFile);
 		f = f.getParentFile().getParentFile();
-		plugin.setAbsolutePath(f.getAbsolutePath());
+		module.setAbsolutePath(f.getAbsolutePath());
 		try {
 			InputStream ips = new FileInputStream(manifestFile);
 			Manifest manifest = new Manifest(ips);
-			fillPluginElementInfo(plugin, manifest);
+			fillModuleElementInfo(module, manifest);
 			ips.close();
 			manifest = null;
-			if (plugin.getName() != null && plugin.getName().contains("%")) {
+			if (module.getName() != null && module.getName().contains("%")) {
 				File localizationFile = new File(f, currentLocalization + ".properties");
 				if (localizationFile.exists()) {
 					Properties prop = new Properties();
@@ -97,15 +97,15 @@ public class PluginInfosExtractor {
 					prop.load(input);
 					// remove also whitespaces, as the problem with
 					// org.eclipse.cdt.dsf.gdb.ui
-					String name = prop.getProperty(plugin.getName().substring(1).replaceAll("\\s", ""));
-					plugin.setName(name);
+					String name = prop.getProperty(module.getName().substring(1).replaceAll("\\s", ""));
+					module.setName(name);
 					input.close();
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return plugin;
+		return module;
 	}
 
 	/*
@@ -113,34 +113,34 @@ public class PluginInfosExtractor {
 	 */
 
 	/**
-	 * Extracts the plugin infos, considering that it is a jar file
+	 * Extracts the module infos, considering that it is a jar file
 	 * 
 	 * @param jarFile
 	 *            the absolute path to the jar file
-	 * @return the plugin element
+	 * @return the module element
 	 */
-	public static ModuleElement getPluginInfosFromJar(String jarFile) {
-		ModuleElement plugin = new ModuleElement();
-		plugin.setJar(true);
-		plugin.setAbsolutePath(jarFile);
+	public static ModuleElement getModuleInfosFromJar(String jarFile) {
+		ModuleElement module = new ModuleElement();
+		module.setJar(true);
+		module.setAbsolutePath(jarFile);
 		try {
 			File f = new File(jarFile);
 			JarFile jar = new JarFile(f);
-			fillPluginElementInfo(plugin, jar.getManifest());
-			if (plugin.getName() != null && plugin.getName().contains("%")) {
+			fillModuleElementInfo(module, jar.getManifest());
+			if (module.getName() != null && module.getName().contains("%")) {
 				ZipEntry zipEntry = jar.getEntry(currentLocalization + ".properties");
 				if (zipEntry != null) {
 					Properties prop = new Properties();
 					prop.load(jar.getInputStream(zipEntry));
-					String name = prop.getProperty(plugin.getName().substring(1).replaceAll("\\s", ""));
-					plugin.setName(name);
+					String name = prop.getProperty(module.getName().substring(1).replaceAll("\\s", ""));
+					module.setName(name);
 				}
 			}
 			jar.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return plugin;
+		return module;
 	}
 
 	/*
@@ -148,16 +148,16 @@ public class PluginInfosExtractor {
 	 */
 
 	/**
-	 * Extracts all the required plugins' symbolic names from the Require-Bundle
+	 * Extracts all the required modules' symbolic names from the Require-Bundle
 	 * field's value
 	 * 
 	 * @param value
 	 *            a String containing the whole Require-Bundle field's value
-	 * @param plugin
-	 *            the PluginElement for which we are searching the required
-	 *            plugins
+	 * @param module
+	 *            the ModuleElement for which we are searching the required
+	 *            modules
 	 */
-	private static void getRequireBundlesSymbNames(String value, ModuleElement plugin) {
+	private static void getRequireBundlesSymbNames(String value, ModuleElement module) {
 		String[] values = value.split(",");
 		String previous = "";
 		for (String val : values) {
@@ -167,9 +167,9 @@ public class PluginInfosExtractor {
 					val = val.substring(0, i);
 				val = val.replaceAll("\\s", "");
 				previous = val;
-				plugin.addRequire_bundle(val);
+				module.addRequire_bundle(val);
 			} else if (val.contains("resolution:=optional")) {
-				plugin.removeRequire_bundle(previous);
+				module.removeRequire_bundle(previous);
 			}
 		}
 	}
@@ -191,13 +191,13 @@ public class PluginInfosExtractor {
 	}
 
 	/**
-	 * Check if a file is a plugin
+	 * Check if a file is a module
 	 * 
 	 * @param file
-	 * @return true if it is a plugin
+	 * @return true if it is a module
 	 */
-	public static boolean isAPlugin(File file) {
-		if (file.getParentFile().getName().equals("plugins") || file.getParentFile().getName().equals("dropins")) {
+	public static boolean isAModule(File file) {
+		if (file.getParentFile().getName().equals("modules") || file.getParentFile().getName().equals("dropins")) {
 			if (file.isDirectory()) {
 				File manif = new File(file.getAbsolutePath() + "/META-INF/MANIFEST.MF");
 				if (manif.exists()) {

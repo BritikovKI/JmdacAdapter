@@ -7,19 +7,19 @@ import org.but4reuse.adapters.IElement;
 import org.but4reuse.utils.strings.StringUtils;
 
 /**
- * Plugin Element
+ * Module Element
  * 
  * @author Diana MALABARD
  * @author Jason CHUMMUN
  */
 public class ModuleElement extends FileElement {
 
-	private String pluginSymbName;
-	private String pluginVersion;
+	private String moduleSymbName;
+	private String moduleVersion;
 	private String bundleInfoLine;
 	private String fragmentHost;
 	private String name;
-	// each pluginElement in require_Bundles, the list of require_Bundle will be
+	// each moduleElement in require_Bundles, the list of require_Bundle will be
 	// empty.
 	// because we do not know the dependencies
 	// The same thing for absoluthPath
@@ -30,10 +30,10 @@ public class ModuleElement extends FileElement {
 		// When they have the same relative URI
 		// TODO URIs can reference to the same file... check this
 		if (anotherElement instanceof ModuleElement) {
-			ModuleElement anotherPluginElement = ((ModuleElement) anotherElement);
+			ModuleElement anotherModuleElement = ((ModuleElement) anotherElement);
 
 			// Same symbolic name
-			if (this.getSymbName().equals(anotherPluginElement.getSymbName())) {
+			if (this.getSymbName().equals(anotherModuleElement.getSymbName())) {
 				// TODO no versioning supported
 				return 1;
 			}
@@ -53,11 +53,11 @@ public class ModuleElement extends FileElement {
 	}
 
 	public String getSymbName() {
-		return pluginSymbName;
+		return moduleSymbName;
 	}
 
-	public void setSymbName(String pluginSymbName) {
-		this.pluginSymbName = pluginSymbName;
+	public void setSymbName(String moduleSymbName) {
+		this.moduleSymbName = moduleSymbName;
 	}
 
 	public void addRequire_bundle(String require_bundle) {
@@ -70,7 +70,7 @@ public class ModuleElement extends FileElement {
 
 	@Override
 	public String getText() {
-		return name + "  " + pluginSymbName + " " + pluginVersion;
+		return name + "  " + moduleSymbName + " " + moduleVersion;
 	}
 
 	public boolean isJar() {
@@ -90,11 +90,11 @@ public class ModuleElement extends FileElement {
 	}
 
 	public String getVersion() {
-		return pluginVersion;
+		return moduleVersion;
 	}
 
-	public void setVersion(String pluginVersion) {
-		this.pluginVersion = pluginVersion;
+	public void setVersion(String moduleVersion) {
+		this.moduleVersion = moduleVersion;
 	}
 
 	public String getBundleInfoLine() {
