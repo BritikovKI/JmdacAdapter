@@ -5,7 +5,7 @@
          point="org.but4reuse.adapters">
       <adapter
             class="org.but4reuse.adapters.jmdac.JmdacAdapter"
-            icon="icons/icon_jmdac.xpm"
+            icon="icons/icon_jmdac.gif"
             id="jmdac"
             name="Jmdac">
          <elements>
