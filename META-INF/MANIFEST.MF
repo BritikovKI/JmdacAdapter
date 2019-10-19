@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Jmdac Adapter
-Bundle-SymbolicName: org.but4reuse.adapters.jmdac;singleton:=true
+Bundle-SymbolicName: ff;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.but4reuse.adapters.jmdac.activator.Activator
 Require-Bundle: org.eclipse.ui,
