@@ -1,8 +1,10 @@
 package org.but4reuse.adapters.jmdac;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -108,9 +110,8 @@ public class ModuleElement extends AbstractElement implements IMarkerElement {
 	}
 
 	/**
-	 * Read the modules.xml file inside the .jmdac archive
-	 * and get the dependency names and versions (but versions
-	 * are just ignored yet)
+	 * Read the modules.xml file inside the .jmdac archive and get the dependency
+	 * names and versions (but versions are just ignored yet)
 	 * 
 	 * @author jabier.martinez
 	 */
@@ -179,15 +180,63 @@ public class ModuleElement extends AbstractElement implements IMarkerElement {
 	@Override
 	public ArrayList<String> getWords() {
 		ArrayList<String> words = new ArrayList<String>();
-		words.add(getName());  // add the name of the module
-		
-		String moduleDescription = "";  // TODO implement it
+		words.add(getName()); // add the name of the module
+		words.add(getName()); // add the name of the module
+		words.add(getName()); // add the name of the module
+		words.add(getName()); // add the name of the module
+		words.add(getName()); // add the name of the module
+
+
+		String moduleDescription = null;
+		try {
+			moduleDescription = extractModuleDescription();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Could not extract module description::");
+			e.printStackTrace();
+		} // TODO implement it
 		StringTokenizer tk = new StringTokenizer(moduleDescription, " ");
-		
+
 		while (tk.hasMoreTokens()) {
+			
 			String s = tk.nextToken();
-			words.add(s);
+			s = s.replaceAll("\\.", "");
+			s = s.replaceAll(",", "");
+			if (!StopWords.isStopWord(s)) {
+				words.add(s);
+			}
 		}
 		return words;
+	}
+
+	private String extractModuleDescription() throws IOException {
+		System.out.println("Extracting module desciption " + this.getName());
+		ZipFile zipFile = new ZipFile(FileUtils.getFile(uri));
+
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+		while (entries.hasMoreElements()) {
+			ZipEntry entry = entries.nextElement();
+
+			Path entryPath = Paths.get(getName(), "module.properties");
+
+			if (entry.getName().equals(entryPath.toString())) {
+				InputStream stream = zipFile.getInputStream(entry);
+				BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+				// first line is ModuleDescription={description}
+				String description = reader.readLine().split("=", 2)[1];
+
+				// second line is ModuleLabel={label}
+				String label = reader.readLine().split("=", 2)[1];
+
+				System.out.println("description is " + description);
+				System.out.println("label is " + label);
+
+				reader.close();
+				return label + " " + label + " " + label + " " + description;
+			}
+		}
+		zipFile.close();
+		return null;
 	}
 }
