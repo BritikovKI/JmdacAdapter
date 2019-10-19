@@ -4,16 +4,13 @@
    <extension
          point="org.but4reuse.adapters">
       <adapter
-            class="org.but4reuse.adapters.jmdac.JmdacAdapter"
+            class="org.but4reuse.adapters.jmdac.ModuleAdapter"
             icon="icons/icon_jmdac.xpm"
             id="jmdac"
             name="Jmdac">
          <elements>
             <element
-                  element="org.but4reuse.adapters.jmdac.PluginElement">
-            </element>
-            <element
-                  element="org.but4reuse.adapters.jmdac.FileElement">
+                  element="org.but4reuse.adapters.jmdac.ModuleElement">
             </element>
          </elements>
       </adapter>
